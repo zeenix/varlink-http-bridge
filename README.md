@@ -5,8 +5,8 @@ http. The main use case is systemd, so only the subset of varlink that
 systemd needs is supported right now.
 
 It takes a directory with varlink sockets (or symlinks to varlink
-sockets) like /run/systemd/registry as the argument and will server
-whatever it find in there. Sockets can be added or removed dynamically
+sockets) like /run/systemd/registry as the argument and will serve
+whatever it finds in there. Sockets can be added or removed dynamically
 in the dir as needed.
 
 ## URL Schema
