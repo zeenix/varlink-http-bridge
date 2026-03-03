@@ -115,7 +115,7 @@ $ curl -s -X POST http://localhost:1031/call/org.varlink.service.GetInfo?socket=
 
 ### Example (varlinkctl transparent bridge mode)
 
-Sytemd version v260+ support pluggable protocols for varlink, with that the bridge
+Systemd version v260+ supports pluggable protocols for varlink, with that the bridge
 becomes even nicer.
 
 ```console
@@ -140,7 +140,7 @@ still a bit cumbersome to use.
 $ cargo install websocat
 ...
 
-# call via websocat: note that this is the raw procotol so the result is wrapped in "paramters"
+# call via websocat: note that this is the raw procotol so the result is wrapped in "parameters"
 # note that the reply also contains the raw \0 so we filter them
 $ printf '{"method":"io.systemd.Hostname.Describe","parameters":{}}\0' | websocat ws://localhost:1031/ws/sockets/io.systemd.Hostname | tr -d '\0' | jq
 {
