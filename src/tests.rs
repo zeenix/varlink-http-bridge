@@ -773,6 +773,7 @@ async fn run_test_tls_server(
     (task_handle, local_addr)
 }
 
+#[test_with::path(/usr/bin/openssl)]
 #[tokio::test]
 async fn test_tls_basic_connection() {
     let pki = make_test_pki();
@@ -806,6 +807,7 @@ async fn test_tls_basic_connection() {
     assert_eq!(res.status(), 200);
 }
 
+#[test_with::path(/usr/bin/openssl)]
 #[tokio::test]
 async fn test_mtls_accepts_client_cert_and_rejects_without() {
     let pki = make_test_pki();
@@ -860,6 +862,7 @@ async fn test_mtls_accepts_client_cert_and_rejects_without() {
     assert_eq!(res.status(), 200);
 }
 
+#[test_with::path(/usr/bin/openssl)]
 #[tokio::test]
 async fn test_tls_credentials_directory_fallback() {
     let pki = make_test_pki();
@@ -896,6 +899,7 @@ async fn test_tls_credentials_directory_fallback() {
     assert_eq!(res.status(), 200);
 }
 
+#[test_with::path(/usr/bin/openssl)]
 #[test_with::path(/usr/bin/varlinkctl)]
 #[test_with::path(/run/systemd/io.systemd.Hostname)]
 #[tokio::test]
@@ -955,6 +959,7 @@ async fn test_varlinkctl_helper_mtls_hostname_describe() {
     assert_eq!(body["Hostname"], expected_hostname);
 }
 
+#[test_with::path(/usr/bin/openssl)]
 #[test_with::path(/usr/bin/varlinkctl)]
 #[test_with::path(/run/systemd/io.systemd.Hostname)]
 #[tokio::test]
