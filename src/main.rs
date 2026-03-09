@@ -13,7 +13,7 @@ use axum::{
 use listenfd::ListenFd;
 use log::{debug, error, warn};
 use regex_lite::Regex;
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 use std::collections::HashMap;
 use std::os::fd::{AsRawFd, OwnedFd};
@@ -23,7 +23,7 @@ use std::sync::{Arc, LazyLock};
 use tokio::io::{AsyncBufReadExt, AsyncReadExt, AsyncWriteExt};
 use tokio::net::{TcpListener, UnixStream};
 use tokio::signal;
-use zlink::varlink_service::Proxy;
+use zlink::{Reply, varlink_service::Proxy};
 
 #[cfg(feature = "sshauth")]
 mod auth_ssh;
@@ -117,7 +117,7 @@ struct DynMethod<'m> {
 }
 
 /// Successful reply parameters from a dynamic varlink call.
-#[derive(Debug, Default, serde::Deserialize)]
+#[derive(Debug, Default, Deserialize)]
 struct DynReply<'r>(#[serde(borrow)] Option<HashMap<&'r str, Value>>);
 
 impl IntoResponse for DynReply<'_> {
@@ -128,7 +128,7 @@ impl IntoResponse for DynReply<'_> {
 
 /// Error reply from a dynamic varlink call (non-standard errors only; standard
 /// `org.varlink.service.*` errors are caught earlier by zlink).
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, Deserialize)]
 struct DynReplyError<'e> {
     error: &'e str,
     #[serde(default)]
@@ -527,16 +527,16 @@ async fn route_call_post(
 
     let mut connection = get_varlink_connection_with_validate_socket(&socket, &state).await?;
 
-    let call = zlink::Call::new(DynMethod {
+    let method_call = DynMethod {
         method: &method,
         parameters: Some(&call_args),
-    });
+    };
     connection
-        .call_method::<_, DynReply<'_>, DynReplyError<'_>>(&call, vec![])
+        .call_method(&method_call.into(), vec![])
         .await?
         .0
-        .map(|r| r.into_parameters().unwrap_or_default().into_response())
-        .map_err(Into::into)
+        .map(|r: Reply<DynReply>| r.into_parameters().unwrap_or_default().into_response())
+        .map_err(|e: DynReplyError| e.into())
 }
 
 async fn route_ws(
